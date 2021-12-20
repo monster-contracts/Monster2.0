@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@cryptoshuraba/assetbox": "^1.0.1",
+    "@openzeppelin/contracts": "^4.4.1"
+  }
+}
