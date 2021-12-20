@@ -111,6 +111,10 @@ contract Monster is ERC721, Whitelist{
             abilities[0], abilities[1], abilities[2], abilities[3], abilities[4], abilities[5]);
     }
 
+    function burn(uint tokenID) public is_approved{
+        _burn(tokenID);
+    }
+
     function tokenURI(uint tokenID) override public view returns (string memory) {
         string[23] memory parts;
 
