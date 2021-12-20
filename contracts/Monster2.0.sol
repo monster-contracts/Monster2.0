@@ -27,12 +27,23 @@ contract Monster is ERC721, Whitelist{
         uint32 wisdom;
         uint32 charisma;
     }
-    
-    mapping(uint => ability) public monsterAbilitys;
 
-    event claimed(address indexed owner, uint tokenID, string monster, 
+    mapping(uint => ability) public monsterAbility;
+
+    struct original {
+        uint from;
+        uint32 generation;
+        uint emergingTS;
+        uint32 value;
+    }
+    mapping(uint => original) public monsterOriginal;
+    mapping(uint => bool) public hatched;
+
+    event claimed(uint tokenID, string monster, 
         uint32 cr, uint32 type_, uint32 size, uint32 hp,
         uint32 strength, uint32 dexterity, uint32 constitution, uint32 intelligence, uint32 wisdom, uint32 charisma);
+
+    event inited(address owner, uint from, uint32 generation, uint emergingTS, uint32 value);
 
     constructor(string memory name_, string memory symbol_, address ms_) ERC721(name_, symbol_) Whitelist(ms_, symbol_) {
         _symbol = symbol_;
@@ -68,16 +79,25 @@ contract Monster is ERC721, Whitelist{
         return _symbol;
     }
 
-    function claim(address owner, string memory monster, uint32 cr, uint32 type_, uint32 size, uint32 hp, uint32[] memory abilities) public is_approved{
+    function init(address owner, uint from, uint32 generation, uint emergingTS, uint32 value) public is_approved {
         uint tokenID = count;
         count ++;
+        _safeMint(owner, tokenID);
+
+        emit inited(owner, from, generation, emergingTS, value);
+    }
+
+    function claim(uint tokenID, string memory monster, uint32 cr, uint32 type_, uint32 size, uint32 hp, uint32[] memory abilities) public is_approved{
+        require(_exists(tokenID), "token hasn't minted");
+        require(!hatched[tokenID], "token already hatched");
+        
         monsters[tokenID] = monster;
         monsterCR[tokenID] = cr;
         monsterType[tokenID] = type_;
         monsterSize[tokenID] = size;
         monsterHP[tokenID] = hp;
 
-        ability storage _attr = monsterAbilitys[tokenID];
+        ability storage _attr = monsterAbility[tokenID];
         _attr.strength = abilities[0];
         _attr.dexterity = abilities[1];
         _attr.constitution = abilities[2];
@@ -85,9 +105,9 @@ contract Monster is ERC721, Whitelist{
         _attr.wisdom = abilities[4];
         _attr.charisma = abilities[5];
 
-        _safeMint(msg.sender, tokenID);
-        
-        emit claimed(owner, tokenID, monster, cr, type_, size, hp,
+        hatched[tokenID] = true;
+
+        emit claimed(tokenID, monster, cr, type_, size, hp,
             abilities[0], abilities[1], abilities[2], abilities[3], abilities[4], abilities[5]);
     }
 
@@ -104,11 +124,11 @@ contract Monster is ERC721, Whitelist{
 
         parts[4] = '</text><text x="10" y="60" class="base">';
 
-        parts[5] = string(abi.encodePacked("Type", " ", toString(monsterType[tokenID])));
+        parts[5] = string(abi.encodePacked("Type", " ", types[monsterType[tokenID]]));
 
         parts[6] = '</text><text x="10" y="80" class="base">';
 
-        parts[7] = string(abi.encodePacked("Size", " ", toString(monsterSize[tokenID])));
+        parts[7] = string(abi.encodePacked("Size", " ", sizes[monsterSize[tokenID]]));
 
         parts[8] = '</text><text x="10" y="100" class="base">';
 
@@ -116,27 +136,27 @@ contract Monster is ERC721, Whitelist{
 
         parts[10] = '</text><text x="10" y="120" class="base">';
 
-        parts[11] = string(abi.encodePacked("Strength", " ", toString(monsterAbilitys[tokenID].strength)));
+        parts[11] = string(abi.encodePacked("Strength", " ", toString(monsterAbility[tokenID].strength)));
 
         parts[12] = '</text><text x="10" y="140" class="base">';
 
-        parts[13] = string(abi.encodePacked("Dexterity", " ", toString(monsterAbilitys[tokenID].dexterity)));
+        parts[13] = string(abi.encodePacked("Dexterity", " ", toString(monsterAbility[tokenID].dexterity)));
 
         parts[14] = '</text><text x="10" y="160" class="base">';
 
-        parts[15] = string(abi.encodePacked("Constitution", " ", toString(monsterAbilitys[tokenID].constitution)));
+        parts[15] = string(abi.encodePacked("Constitution", " ", toString(monsterAbility[tokenID].constitution)));
 
         parts[16] = '</text><text x="10" y="180" class="base">';
 
-        parts[17] = string(abi.encodePacked("Intelligence", " ", toString(monsterAbilitys[tokenID].intelligence)));
+        parts[17] = string(abi.encodePacked("Intelligence", " ", toString(monsterAbility[tokenID].intelligence)));
 
         parts[18] = '</text><text x="10" y="200" class="base">';
 
-        parts[19] = string(abi.encodePacked("Wisdom", " ", toString(monsterAbilitys[tokenID].wisdom)));
+        parts[19] = string(abi.encodePacked("Wisdom", " ", toString(monsterAbility[tokenID].wisdom)));
 
         parts[20] = '</text><text x="10" y="220" class="base">';
 
-        parts[21] = string(abi.encodePacked("Charisma", " ", toString(monsterAbilitys[tokenID].charisma)));
+        parts[21] = string(abi.encodePacked("Charisma", " ", toString(monsterAbility[tokenID].charisma)));
 
         parts[22] = '</text></svg>';
 
