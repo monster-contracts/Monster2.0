@@ -68,8 +68,7 @@ contract Monster is ERC721, Whitelist{
         return _symbol;
     }
 
-    function claim(address owner, string memory monster, uint32 cr, uint32 type_, uint32 size, uint32 hp,
-            uint32 strength, uint32 dexterity, uint32 constitution, uint32 intelligence, uint32 wisdom, uint32 charisma) public is_approved{
+    function claim(address owner, string memory monster, uint32 cr, uint32 type_, uint32 size, uint32 hp, uint32[] memory abilities) public is_approved{
         uint tokenID = count;
         count ++;
         monsters[tokenID] = monster;
@@ -79,17 +78,17 @@ contract Monster is ERC721, Whitelist{
         monsterHP[tokenID] = hp;
 
         ability storage _attr = monsterAbilitys[tokenID];
-        _attr.strength = strength;
-        _attr.dexterity = dexterity;
-        _attr.constitution = constitution;
-        _attr.intelligence = intelligence;
-        _attr.wisdom = wisdom;
-        _attr.charisma = charisma;
+        _attr.strength = abilities[0];
+        _attr.dexterity = abilities[1];
+        _attr.constitution = abilities[2];
+        _attr.intelligence = abilities[3];
+        _attr.wisdom = abilities[4];
+        _attr.charisma = abilities[5];
 
         _safeMint(msg.sender, tokenID);
         
         emit claimed(owner, tokenID, monster, cr, type_, size, hp,
-            strength, dexterity, constitution, intelligence, wisdom, charisma);
+            abilities[0], abilities[1], abilities[2], abilities[3], abilities[4], abilities[5]);
     }
 
     function tokenURI(uint tokenID) override public view returns (string memory) {
