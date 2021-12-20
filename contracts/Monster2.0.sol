@@ -79,9 +79,16 @@ contract Monster is ERC721, Whitelist{
         return _symbol;
     }
 
-    function init(address owner, uint from, uint32 generation, uint emergingTS, uint32 value) public is_approved {
+    function init(address owner, uint from, uint32 generation, uint32 value) public is_approved {
         uint tokenID = count;
         count ++;
+
+        uint emergingTS = block.timestamp;
+        original storage orgi = monsterOriginal[tokenID];
+        orgi.from = from;
+        orgi.generation = generation;
+        orgi.emergingTS = emergingTS;
+        orgi.value = value;
         _safeMint(owner, tokenID);
 
         emit inited(owner, from, generation, emergingTS, value);
