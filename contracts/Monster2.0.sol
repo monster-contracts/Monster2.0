@@ -123,6 +123,10 @@ contract Monster is ERC721, Whitelist{
     }
 
     function tokenURI(uint tokenID) override public view returns (string memory) {
+        if (!hatched[tokenID]){
+            return _originalURI(tokenID);
+        }
+
         string[23] memory parts;
 
         parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="#160C0A" /><text x="10" y="20" class="base">';
@@ -179,6 +183,38 @@ contract Monster is ERC721, Whitelist{
             parts[15], parts[16], parts[17], parts[18], parts[19], parts[20]));
         
         output = string(abi.encodePacked(output, parts[21], parts[22]));
+
+        string memory json = Base64.encode(bytes(string(
+            abi.encodePacked('{"name": "Bag #', toString(tokenID), '", "description": "Monster NFT is a kind of NFT assets randomized generated and stored on blockchain with different names, prefessions, basic attribute value and random attribute value, which can be used in any scene. The rarity of monster NFT is determined by its peofession, arrtribute value and game ecology. Level, scene and image is ommitted as part of further expansions.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
+        output = string(abi.encodePacked('data:application/json;base64,', json));
+
+        return output;
+    }
+
+    function _originalURI(uint tokenID) private view returns (string memory) {
+        string[9] memory parts;
+
+        parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="#160C0A" /><text x="10" y="20" class="base">';
+
+        parts[1] = string(abi.encodePacked("From", " ", toString(monsterOriginal[tokenID].from)));
+
+        parts[2] = '</text><text x="10" y="40" class="base">';
+
+        parts[3] = string(abi.encodePacked("Generation", " ", toString(monsterOriginal[tokenID].generation)));
+
+        parts[4] = '</text><text x="10" y="60" class="base">';
+
+        parts[5] = string(abi.encodePacked("Emerging Timestamp", " ", toString(monsterOriginal[tokenID].emergingTS)));
+
+        parts[6] = '</text><text x="10" y="80" class="base">';
+
+        parts[7] = string(abi.encodePacked("Value", " ", toString(monsterOriginal[tokenID].value)));
+
+        parts[8] = '</text></svg>';
+
+        string memory output = string(abi.encodePacked(
+            parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7], 
+            parts[8]));
 
         string memory json = Base64.encode(bytes(string(
             abi.encodePacked('{"name": "Bag #', toString(tokenID), '", "description": "Monster NFT is a kind of NFT assets randomized generated and stored on blockchain with different names, prefessions, basic attribute value and random attribute value, which can be used in any scene. The rarity of monster NFT is determined by its peofession, arrtribute value and game ecology. Level, scene and image is ommitted as part of further expansions.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
