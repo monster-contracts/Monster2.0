@@ -12,9 +12,11 @@ contract Monster is ERC721, Whitelist{
 
     mapping(uint => string) public types;
     mapping(uint => string) public sizes;
+    mapping(uint32 => string) public CRConverter;
 
     mapping(uint => string) public monsters;
-    mapping(uint => uint32) public monsterCR;
+    mapping(uint => string) public monsterCR;
+    mapping(uint => uint32) public monsterCRV;
     mapping(uint => uint32) public monsterHP;
     mapping(uint => uint32) public monsterType;
     mapping(uint => uint32) public monsterSize;
@@ -73,6 +75,40 @@ contract Monster is ERC721, Whitelist{
         sizes[7] = "Huge";
         sizes[8] = "Gargantuan";
         sizes[9] = "Colossal";
+
+        CRConverter[1] = "1/10";
+        CRConverter[2] = "1/8";
+        CRConverter[3] = "1/6";
+        CRConverter[4] = "1/4";
+        CRConverter[5] = "1/3";
+        CRConverter[6] = "1/2";
+        CRConverter[7] = "1";
+        CRConverter[8] = "2";
+        CRConverter[9] = "3";
+        CRConverter[10] = "4";
+        CRConverter[11] = "5";
+        CRConverter[12] = "6";
+        CRConverter[13] = "7";
+        CRConverter[14] = "8";
+        CRConverter[15] = "9";
+        CRConverter[16] = "10";
+        CRConverter[17] = "11";
+        CRConverter[18] = "12";
+        CRConverter[19] = "13";
+        CRConverter[20] = "14";
+        CRConverter[21] = "15";
+        CRConverter[22] = "16";
+        CRConverter[23] = "17";
+        CRConverter[24] = "18";
+        CRConverter[25] = "19";
+        CRConverter[26] = "20";
+        CRConverter[27] = "21";
+        CRConverter[28] = "22";
+        CRConverter[29] = "23";
+        CRConverter[30] = "24";
+        CRConverter[31] = "25";
+        CRConverter[32] = "26";
+        CRConverter[33] = "27";
     }
 
     function symbol() public view override(ERC721, Whitelist) returns (string memory) {
@@ -94,12 +130,13 @@ contract Monster is ERC721, Whitelist{
         emit inited(owner, from, generation, emergingTS, value);
     }
 
-    function claim(uint tokenID, string memory monster, uint32 cr, uint32 type_, uint32 size, uint32 hp, uint32[] memory abilities) public is_approved{
+    function claim(uint tokenID, string memory monster, uint32 crv, uint32 type_, uint32 size, uint32 hp, uint32[] memory abilities) public is_approved{
         require(_exists(tokenID), "token hasn't minted");
         require(!hatched[tokenID], "token already hatched");
         
         monsters[tokenID] = monster;
-        monsterCR[tokenID] = cr;
+        monsterCRV[tokenID] = crv;
+        monsterCR[tokenID] = CRConverter[crv];
         monsterType[tokenID] = type_;
         monsterSize[tokenID] = size;
         monsterHP[tokenID] = hp;
@@ -131,7 +168,7 @@ contract Monster is ERC721, Whitelist{
 
         parts[2] = '</text><text x="10" y="40" class="base">';
 
-        parts[3] = string(abi.encodePacked("CR", " ", toString(monsterCR[tokenID])));
+        parts[3] = string(abi.encodePacked("CR", " ", monsterCR[tokenID]));
 
         parts[4] = '</text><text x="10" y="60" class="base">';
 
