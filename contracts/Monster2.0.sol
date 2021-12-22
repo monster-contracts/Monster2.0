@@ -151,7 +151,7 @@ contract Monster is ERC721, Whitelist{
 
         hatched[tokenID] = true;
 
-        emit claimed(tokenID, monster, cr, type_, size, hp,
+        emit claimed(tokenID, monster, crv, type_, size, hp,
             abilities[0], abilities[1], abilities[2], abilities[3], abilities[4], abilities[5]);
     }
 
