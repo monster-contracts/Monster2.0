@@ -32,20 +32,23 @@ contract Monster is ERC721, Whitelist{
 
     mapping(uint => ability) public monsterAbility;
 
-    struct original {
+    struct Original {
         uint from;
         uint32 generation;
         uint emergingTS;
         uint32 value;
     }
-    mapping(uint => original) public monsterOriginal;
+    mapping(uint => Original) public monsterOriginal;
+    mapping(uint => uint32) private readyToHatch;
     mapping(uint => bool) public hatched;
 
     event claimed(uint tokenID, string monster, 
         uint32 cr, uint32 type_, uint32 size, uint32 hp,
         uint32 strength, uint32 dexterity, uint32 constitution, uint32 intelligence, uint32 wisdom, uint32 charisma);
 
-    event inited(address owner, uint from, uint32 generation, uint emergingTS, uint32 value);
+    event initialed(address owner, uint from, uint32 generation, uint emergingTS, uint32 value);
+
+    event readied(uint tokenID, uint32 index);
 
     constructor(string memory name_, string memory symbol_, address ms_) ERC721(name_, symbol_) Whitelist(ms_, symbol_) {
         _symbol = symbol_;
@@ -111,6 +114,18 @@ contract Monster is ERC721, Whitelist{
         CRConverter[33] = "27";
     }
 
+    function getReadyToHatch(uint tokenID) public view returns (uint32 index){
+        index = readyToHatch[tokenID];
+    }
+
+    function setReadyToHatch(uint tokenID, uint32 index) public is_approved {
+        require(getReadyToHatch(tokenID) == 0, "Have been ready");
+
+        readyToHatch[tokenID] = index;
+
+        emit readied(tokenID, index);
+    }
+
     function symbol() public view override(ERC721, Whitelist) returns (string memory) {
         return _symbol;
     }
@@ -120,17 +135,17 @@ contract Monster is ERC721, Whitelist{
         count ++;
 
         uint emergingTS = block.timestamp;
-        original storage orgi = monsterOriginal[tokenID];
+        Original storage orgi = monsterOriginal[tokenID];
         orgi.from = from;
         orgi.generation = generation;
         orgi.emergingTS = emergingTS;
         orgi.value = value;
         _safeMint(owner, tokenID);
 
-        emit inited(owner, from, generation, emergingTS, value);
+        emit initialed(owner, from, generation, emergingTS, value);
     }
 
-    function claim(uint tokenID, string memory monster, uint32 crv, uint32 type_, uint32 size, uint32 hp, uint32[] memory abilities) public is_approved{
+    function claim(uint tokenID, string memory monster, uint32 crv, uint32 type_, uint32 size, uint32 hp, uint32[6] memory abilities) public is_approved{
         require(_exists(tokenID), "token hasn't minted");
         require(!hatched[tokenID], "token already hatched");
         
