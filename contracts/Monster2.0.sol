@@ -46,7 +46,7 @@ contract Monster is ERC721, Whitelist{
         uint32 cr, uint32 type_, uint32 size, uint32 hp,
         uint32 strength, uint32 dexterity, uint32 constitution, uint32 intelligence, uint32 wisdom, uint32 charisma);
 
-    event initialed(address owner, uint from, uint32 generation, uint emergingTS, uint32 value);
+    event initialed(address owner, uint tokenID, uint from, uint32 generation, uint emergingTS, uint32 value);
 
     event readied(uint tokenID, uint32 index);
 
@@ -142,7 +142,7 @@ contract Monster is ERC721, Whitelist{
         orgi.value = value;
         _safeMint(owner, tokenID);
 
-        emit initialed(owner, from, generation, emergingTS, value);
+        emit initialed(owner, tokenID, from, generation, emergingTS, value);
     }
 
     function claim(uint tokenID, string memory monster, uint32 crv, uint32 type_, uint32 size, uint32 hp, uint32[6] memory abilities) public is_approved{
